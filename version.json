@@ -1,5 +1,10 @@
 {
   "version": "1.22.2",
-  "url": "https://cdn.jsdelivr.net/gh/xyxyyx933-coder/suyun-quote@main/dist/SuyunQuote.exe",
-  "notes": "统一橙色玻璃界面 · 内嵌客户管理与智能排箱 · 更新源切换到自有仓库"
+  "url": "https://ghfast.top/https://github.com/xyxyyx933-coder/suyun-quote/releases/download/v1.22.2/SuyunQuote.exe",
+  "mirrors": [
+    "https://gh-proxy.com/https://github.com/xyxyyx933-coder/suyun-quote/releases/download/v1.22.2/SuyunQuote.exe",
+    "https://ghproxy.net/https://github.com/xyxyyx933-coder/suyun-quote/releases/download/v1.22.2/SuyunQuote.exe",
+    "https://github.com/xyxyyx933-coder/suyun-quote/releases/download/v1.22.2/SuyunQuote.exe"
+  ],
+  "notes": "统一橙色玻璃界面 · 内嵌客户管理与智能排箱 · 更新源已切换到自有仓库"
 }

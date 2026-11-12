@@ -4,11 +4,18 @@
 
 ## 下载
 
-- **程序（免安装单文件）**：`dist/SuyunQuote.exe`
-- 高速镜像：<https://cdn.jsdelivr.net/gh/xyxyyx933-coder/suyun-quote@main/dist/SuyunQuote.exe>
-- GitHub 直链：<https://github.com/xyxyyx933-coder/suyun-quote/raw/main/dist/SuyunQuote.exe>
+Windows 10/11 免安装单文件，双击即用（依赖系统自带 WebView2 内核）。
 
-Windows 10/11，双击即用（依赖系统自带 WebView2 内核）。数据保存在 exe 同目录，升级时把旧 exe 换掉即可，数据文件不受影响。
+| 线路 | 链接 |
+|---|---|
+| 线路 1（推荐） | https://ghfast.top/https://github.com/xyxyyx933-coder/suyun-quote/releases/download/v1.22.2/SuyunQuote.exe |
+| 线路 2 | https://gh-proxy.com/https://github.com/xyxyyx933-coder/suyun-quote/releases/download/v1.22.2/SuyunQuote.exe |
+| 线路 3 | https://ghproxy.net/https://github.com/xyxyyx933-coder/suyun-quote/releases/download/v1.22.2/SuyunQuote.exe |
+| GitHub 原生 | https://github.com/xyxyyx933-coder/suyun-quote/releases/download/v1.22.2/SuyunQuote.exe |
+
+国内网络访问 github.com 常被阻断，因此推荐前三条镜像线路。仓库内 `dist/SuyunQuote.exe` 是同一份程序的备份副本。
+
+升级方式：下载新 exe，替换掉旧 exe 即可。业务数据存在 exe 同目录的 JSON 文件里，不受影响。
 
 ## 功能
 
@@ -18,21 +25,31 @@ Windows 10/11，双击即用（依赖系统自带 WebView2 内核）。数据保
 
 ## 自动更新
 
-程序启动时会读取本仓库根目录的 `version.json`：
+程序启动时读取本仓库根目录的 `version.json`：
 
 ```json
-{ "version": "1.22.2", "url": "下载地址", "notes": "更新说明" }
+{
+  "version": "1.22.2",
+  "url": "主下载地址",
+  "mirrors": ["备用地址1", "备用地址2"],
+  "notes": "更新说明"
+}
 ```
 
-读取顺序为三路镜像自动回退（jsDelivr 主节点 → jsDelivr 备用 → GitHub 原生），任意一路可达即可。
-发新版本只需：替换 `dist/SuyunQuote.exe`、把 `version.json` 里的 `version` 调高，再把程序内的 `data-version` 改成同一版本号重新打包。
+版本源按三路镜像自动回退读取：jsDelivr 主节点 → jsDelivr 备用节点 → GitHub 原生，任意一路可达即可。发现新版本时顶部弹出提示条，「下载更新」走主地址，下载不动可点「备用线路」依次切换。
+
+发新版本流程：
+1. 把 `data-version` 改成新版本号，重新打包；
+2. 新建 Release 并上传 exe（文件名建议保持 `SuyunQuote.exe`）；
+3. 更新 `version.json` 的 `version` / `url` / `mirrors`；
+4. 到 <https://purge.jsdelivr.net/gh/xyxyyx933-coder/suyun-quote@main/version.json> 刷新镜像缓存（约 1 分钟生效）。
 
 ## 目录
 
 ```
 version.json          版本信息（自动更新用）
-dist/SuyunQuote.exe   主程序
-source/main.html      主程序界面（导航/运费/汇总）
+dist/SuyunQuote.exe   主程序备份副本
+source/main.html      主程序界面（导航 / 运费 / 汇总）
 source/quote.html     报价计算器界面（内嵌 iframe）
 source/app.py         桌面宿主（pywebview + 本地数据读写 + 汇率）
 ```

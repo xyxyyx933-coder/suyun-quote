@@ -1074,6 +1074,8 @@ body{
   padding:6px 14px;border-radius:8px;font-weight:600;font-size:12.5px;white-space:nowrap;
 }
 #updateBar .ub-btn:hover{background:var(--brand-dk)}
+#updateBar .ub-btn.ghost{background:rgba(255,255,255,.14);color:#fff}
+#updateBar .ub-btn.ghost:hover{background:rgba(255,255,255,.26)}
 #updateBar .ub-close{
   border:0;background:transparent;color:#9ca3af;cursor:pointer;
   font-size:16px;line-height:1;padding:0 2px;
@@ -5318,13 +5320,26 @@ function showUpdateBar(info){
     <span class="ub-icon">🆕</span>
     <span class="ub-text">有新版本 <b>v${info.version || ''}</b>${info.notes ? ' · ' + info.notes : ''}</span>
     <button class="ub-btn" id="ubDownload">下载更新</button>
+    <button class="ub-btn ghost" id="ubAlt" title="主线路下载不动时切换">备用线路</button>
     <button class="ub-close" id="ubClose" title="关闭">×</button>`;
   document.body.appendChild(bar);
 
+  /* 下载线路：主地址 + version.json 里的 mirrors 备用线路，点「备用线路」依次切换 */
+  const dlUrls = [info.url].concat(Array.isArray(info.mirrors) ? info.mirrors : []).filter(Boolean);
+  let dlIdx = 0;
   const dl = bar.querySelector('#ubDownload');
-  if(dl && info.url) dl.onclick = () => {
-    try{ window.open(info.url, '_blank'); }catch(e){}
+  if(dl && dlUrls.length) dl.onclick = () => {
+    try{ window.open(dlUrls[dlIdx], '_blank'); }catch(e){}
   };
+  const alt = bar.querySelector('#ubAlt');
+  if(alt){
+    if(dlUrls.length < 2){ alt.remove(); }
+    else alt.onclick = () => {
+      dlIdx = (dlIdx + 1) % dlUrls.length;
+      try{ window.open(dlUrls[dlIdx], '_blank'); }catch(e){}
+      alt.textContent = '线路 ' + (dlIdx + 1) + '/' + dlUrls.length;
+    };
+  }
   const cl = bar.querySelector('#ubClose');
   if(cl) cl.onclick = () => bar.remove();
 }
