@@ -5259,13 +5259,14 @@ let booted = false;
 
 /* ========================= 版本检测 ========================= */
 // 版本源：仓库里的 version.json，内容格式：
-//   { "version": "1.22.1", "url": "下载链接", "notes": "更新说明" }
-// 仓库：GitHub -> 只改 GH_REPO 这一行，下面三个镜像地址自动跟着变
+//   { "version": "1.22.2", "url": "下载链接", "mirrors": ["备用地址"], "notes": "更新说明" }
+// 仓库：GitHub -> 只改 GH_REPO 这一行，下面几条线路自动跟着变
 const GH_REPO = 'xyxyyx933-coder/suyun-quote';
 const UPDATE_SOURCES = [
-  'https://cdn.jsdelivr.net/gh/' + GH_REPO + '@main/version.json',        // jsDelivr 主镜像
-  'https://fastly.jsdelivr.net/gh/' + GH_REPO + '@main/version.json',   // jsDelivr 备用节点
-  'https://raw.githubusercontent.com/' + GH_REPO + '/main/version.json' // GitHub 原生（部分地区不可达）
+  'https://api.github.com/repos/' + GH_REPO + '/contents/version.json?ref=main', // GitHub API（不走 CDN 缓存，国内通常可达）
+  'https://cdn.jsdelivr.net/gh/' + GH_REPO + '@main/version.json',               // jsDelivr 主镜像
+  'https://fastly.jsdelivr.net/gh/' + GH_REPO + '@main/version.json',            // jsDelivr 备用节点
+  'https://raw.githubusercontent.com/' + GH_REPO + '/main/version.json'          // GitHub 原生
 ];
 
 function verParse(s){
@@ -5283,14 +5284,23 @@ function verCmp(a, b){
 async function checkUpdate(manual){
   const local = verParse(document.body.getAttribute('data-version') || '1.0.0');
   let info = null;
-  /* 依次尝试各镜像，任意一个成功即可 */
+  /* 依次尝试各线路，任意一个成功即可 */
   for(const src of UPDATE_SOURCES){
     try{
       const r = await fetch(src + (src.indexOf('?') < 0 ? '?' : '&') + 't=' + Date.now(), {cache: 'no-store'});
       if(!r.ok) continue;
-      const j = await r.json();
+      let j = await r.json();
+      /* GitHub API 返回的是 base64 包装，需要解出来 */
+      if(j && !j.version && j.content && j.encoding === 'base64'){
+        try{
+          const bin = atob(String(j.content).replace(/\s/g, ''));
+          const bytes = new Uint8Array(bin.length);
+          for(let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+          j = JSON.parse(new TextDecoder('utf-8').decode(bytes));
+        }catch(e){ continue; }
+      }
       if(j && j.version){ info = j; break; }
-    }catch(e){ /* 换下一个镜像 */ }
+    }catch(e){ /* 换下一个线路 */ }
   }
   if(!info){
     if(manual) toast('检测失败，请检查网络');
